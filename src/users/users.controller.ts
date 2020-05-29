@@ -12,11 +12,13 @@ import {
   UseGuards,
   HttpException,
   HttpStatus,
+  Response
 } from '@nestjs/common';
 import { AuthService } from '../auth/auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { UsersService } from './users.service';
 import { UserDTO } from './user.model';
+import { sendSuccessEmail } from 'src/utilities/sendMail';
 
 @Controller('users')
 export class UsersController {
@@ -33,6 +35,10 @@ export class UsersController {
   @Post('signin')
   async login(@Request() req) {
     const data = await this.authService.login(req.user);
+    
+    if(data.success)
+      req.res.cookie('token', data.data.access_token, { httpOnly: true });
+
     return data;
   }
   /**
@@ -40,9 +46,10 @@ export class UsersController {
    * @param req Request
    */
   @UseGuards(AuthGuard('jwt'))
-  @Get('profile')
+  @Post('profile')
   getProfile(@Request() req) {
-    return this.userService.profile(req.body.id);
+    //return .this.userService.profile(req.body.id);
+    return {success: true};
   }
 
   /**

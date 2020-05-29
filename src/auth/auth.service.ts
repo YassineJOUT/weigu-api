@@ -1,19 +1,20 @@
 /*
- * @file-description : Authentication service provide user validation and JWT token generation
- * @author{Yassine JOUT} yassinejout@gmail.com
- */
+  * @file-description : Authentication service provide user validation and JWT token generation
+  * @author{Yassine JOUT} yassinejout@gmail.com
+*/
 
 // Import the required modules
 import { Injectable } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 
+
 @Injectable()
 export class AuthService {
   constructor(
     private readonly usersService: UsersService,
-    private readonly jwtService: JwtService,
-  ) {}
+    private readonly jwtService: JwtService
+    ) {}
 
   async validateUser(email: string, pass: string): Promise<any> {
     const user = await this.usersService.findUser(email);
@@ -28,20 +29,24 @@ export class AuthService {
       success: false,
       error: {
         code: 1,
-        message: 'Username or password incorrect',
-      },
+        message: "Username or password incorrect"
+      }
     };
   }
 
   async login(user) {
-    const playload = { email: user.email, sub: user._id };
-    const userD = user;
-    return {
-      success: true,
-      data: {
+    if(user.success){
+      const playload = { email: user.data.email, sub: user.data._id };
+      const userD = user.data;
+      return {
+        success: true,
+        data:{
         access_token: this.jwtService.sign(playload),
-        user: userD,
-      },
-    };
+        user: userD
+      }
+      };
+    }
+    return user;
+    
   }
 }
