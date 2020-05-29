@@ -16,19 +16,31 @@ export class UsersController{
         private readonly userService: UsersService,
         private readonly authService: AuthService
         ){}
+
+    /**
+     * Funciton: Login
+     * @param req Request
+     */
     @UseGuards(AuthGuard('local'))
     @Post('signin')
     async login(@Request() req){
         const data = await this.authService.login(req.user);
         return { status: 'success', token : data.access_token, user: data.user};
     }
-
+    /**
+     * Function: Profile -> Get profile Info
+     * @param req Request
+     */
     @UseGuards(AuthGuard('jwt'))
     @Get('profile')
     getProfile(@Request() req) {
       return this.userService.profile(req.body.id);
     }
 
+    /**
+     * Function: Reset Password
+     * @param req Request
+     */
     @Post('resetPassword')
     changePwd(@Request() req) {
       const resultValue = this.userService.changePassword(req.body.email,req.body.confirmationCode,req.body.password);
@@ -47,13 +59,19 @@ export class UsersController{
 
   
 
-    
+    /**
+     * Function: Password forgotten
+     * @param req Request 
+     */
     @Post('passwordForgotten')
     passwordForgotten(@Request() req) {
       return this.userService.passwordForgotten(req.body.email,req.body.confirmationCode);
     }
 
-    
+    /**
+     * Function: Sign up
+     * @param req Request
+     */
     @Post('signup')
     addUser(@Request() req){
         const user = new UserDTO(req.body.username,req.body.email,req.body.password);
