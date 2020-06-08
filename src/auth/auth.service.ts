@@ -4,6 +4,7 @@
 */
 
 // Import the required modules
+import * as bcryptjs from 'bcryptjs';
 import { Injectable } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
@@ -18,20 +19,38 @@ export class AuthService {
 
   async validateUser(email: string, pass: string): Promise<any> {
     const user = await this.usersService.findUser(email);
-    if (user && user.password === pass) {
-      const { password, ...result } = user;
+    console.log("user")
+    console.log(user)
+    if (!user) {
       return {
-        data: result,
-        success: true,
-      };
-    }
-    return {
-      success: false,
-      error: {
-        code: 1,
-        message: "Username or password incorrect"
+        success: false,
+        error: {
+          code: 1,
+          message: "Username or password incorrect"
+        }
       }
+    }
+
+    
+    const valid = await bcryptjs.compare(pass, user.password);
+    console.log("valid")
+    console.log(valid)
+    if (!valid) {
+      return {
+        success: false,
+        error: {
+          code: 1,
+          message: "Username or password incorrect"
+        }
+      }
+    }
+  
+    
+    return {
+      data: user,
+      success: true,
     };
+    
   }
 
   async login(user) {

@@ -12,13 +12,14 @@ import {
   UseGuards,
   HttpException,
   HttpStatus,
-  Response
+  Response,
 } from '@nestjs/common';
 import { AuthService } from '../auth/auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { UsersService } from './users.service';
 import { UserDTO } from './user.model';
 import { sendSuccessEmail } from 'src/utilities/sendMail';
+import * as bcryptjs from 'bcryptjs';
 
 @Controller('users')
 export class UsersController {
@@ -35,8 +36,8 @@ export class UsersController {
   @Post('signin')
   async login(@Request() req) {
     const data = await this.authService.login(req.user);
-    
-    if(data.success)
+    console.log(data)
+    if (data.success)
       req.res.cookie('token', data.data.access_token, { httpOnly: true });
 
     return data;
@@ -49,7 +50,7 @@ export class UsersController {
   @Post('profile')
   getProfile(@Request() req) {
     //return .this.userService.profile(req.body.id);
-    return {success: true};
+    return { success: true };
   }
 
   /**
@@ -97,12 +98,22 @@ export class UsersController {
    * @param req Request
    */
   @Post('signup')
-  addUser(@Request() req) {
-    const user = new UserDTO(
-      req.body.username,
-      req.body.email,
-      req.body.password,
-    );
-    return this.userService.insertUser(user);
+  async addUser(@Request() req) {
+    const emailExists = await this.userService.findUser(req.body.email);
+    // this is to be dropped
+    if (emailExists) {
+      throw Error('Email is already in use');
+    }
+    const password = await bcryptjs.hash(req.body.password, 10);
+
+    const user = await this.userService.insertUser({
+      username: req.body.username,
+      email: req.body.email,
+      password,
+    });
+    console.log(user)
+    return {
+      success: true,
+    };
   }
 }
