@@ -18,7 +18,7 @@ import { AuthService } from '../auth/auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { UsersService } from './users.service';
 import { UserDTO } from './user.model';
-import { sendSuccessEmail } from 'src/utilities/sendMail';
+import { sendSuccessRegisterEmail } from 'src/utilities/sendMail';
 import * as bcryptjs from 'bcryptjs';
 
 @Controller('users')
@@ -36,7 +36,6 @@ export class UsersController {
   @Post('signin')
   async login(@Request() req) {
     const data = await this.authService.login(req.user);
-    console.log(data)
     if (data.success)
       req.res.cookie('token', data.data.access_token, { httpOnly: true });
 
@@ -102,18 +101,34 @@ export class UsersController {
     const emailExists = await this.userService.findUser(req.body.email);
     // this is to be dropped
     if (emailExists) {
-      throw Error('Email is already in use');
+      return {
+        success: false,
+        error: {
+          code: 2,
+          message: 'Email already exists!',
+        },
+      };
     }
     const password = await bcryptjs.hash(req.body.password, 10);
 
-    const user = await this.userService.insertUser({
-      username: req.body.username,
-      email: req.body.email,
-      password,
-    });
-    console.log(user)
-    return {
-      success: true,
-    };
+    try {
+      await this.userService.insertUser({
+        username: req.body.username,
+        email: req.body.email,
+        password,
+      });
+      sendSuccessRegisterEmail(req.body.email);
+      return {
+        success: true,
+      };
+    } catch (err) {
+      return {
+        success: false,
+        error: {
+          code: 2,
+          message: 'Something went wrong!',
+        },
+      };
+    }
   }
 }

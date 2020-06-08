@@ -19,8 +19,7 @@ export class AuthService {
 
   async validateUser(email: string, pass: string): Promise<any> {
     const user = await this.usersService.findUser(email);
-    console.log("user")
-    console.log(user)
+   
     if (!user) {
       return {
         success: false,
@@ -33,8 +32,7 @@ export class AuthService {
 
     
     const valid = await bcryptjs.compare(pass, user.password);
-    console.log("valid")
-    console.log(valid)
+  
     if (!valid) {
       return {
         success: false,

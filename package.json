@@ -29,6 +29,7 @@
     "@nestjs/platform-express": "^6.7.2",
     "@types/ejs": "^3.0.0",
     "@types/nodemailer": "^6.2.2",
+    "bcryptjs": "^2.4.3",
     "dotenv": "^8.2.0",
     "ejs": "^3.0.1",
     "mongoose": "^5.7.8",
