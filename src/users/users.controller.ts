@@ -7,7 +7,6 @@
 import {
   Controller,
   Post,
-  Get,
   Request,
   UseGuards,
   HttpException,
@@ -17,9 +16,9 @@ import {
 import { AuthService } from '../auth/auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { UsersService } from './users.service';
-import { UserDTO } from './user.model';
 import { sendSuccessRegisterEmail } from 'src/utilities/sendMail';
 import * as bcryptjs from 'bcryptjs';
+import { USER_EXISTS, UNKNOWN_ERROR } from 'src/utilities/constants';
 
 @Controller('users')
 export class UsersController {
@@ -104,8 +103,7 @@ export class UsersController {
       return {
         success: false,
         error: {
-          code: 2,
-          message: 'Email already exists!',
+          message: USER_EXISTS,
         },
       };
     }
@@ -124,10 +122,8 @@ export class UsersController {
     } catch (err) {
       return {
         success: false,
-        error: {
-          code: 2,
-          message: 'Something went wrong!',
-        },
+        error:  UNKNOWN_ERROR
+      
       };
     }
   }

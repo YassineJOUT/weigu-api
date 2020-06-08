@@ -8,6 +8,7 @@ import * as bcryptjs from 'bcryptjs';
 import { Injectable } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
+import { USER_EXISTS } from 'src/utilities/constants';
 
 
 @Injectable()
@@ -23,10 +24,8 @@ export class AuthService {
     if (!user) {
       return {
         success: false,
-        error: {
-          code: 1,
-          message: "Username or password incorrect"
-        }
+        error: USER_EXISTS
+        
       }
     }
 
@@ -36,10 +35,8 @@ export class AuthService {
     if (!valid) {
       return {
         success: false,
-        error: {
-          code: 1,
-          message: "Username or password incorrect"
-        }
+        error:  USER_EXISTS
+        
       }
     }
   
