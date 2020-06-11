@@ -5,7 +5,6 @@ import * as ejs from 'ejs';
 import { join } from 'path';
 
 config();
-console.log(process.env.SMTP_USER)
 // create reusable transporter object using the default SMTP transport
 let transporter = createTransport({
   host: process.env.SMTP_HOST,
@@ -32,7 +31,7 @@ export const sendSuccessEmail = async (email: string) => {
   let textToHTML = ejs.render(template);
 
   await transporter.sendMail({
-    from: '"Password Reset -Weigu- " <app.workers19@gmail.com>', // sender address
+    from: '"Password Reset -Weigu- " <yjdeve20@gmail.com>', // sender address
     to: email, // list of receivers
     subject: 'Password Reset', // Subject line
     html: textToHTML, // html body
@@ -43,7 +42,7 @@ export const sendSuccessEmail = async (email: string) => {
 export const sendSuccessRegisterEmail = async (email: string) => {
   // Generate test SMTP service account from ethereal.email
   // Only needed if you don't have a real mail account for testing
-  const filename = 'emailRegisterSuccess.html';
+  const filename = 'emailRegisterSuccess.ejs';
   // send mail with defined transport object
 
   var template: any = fs.readFileSync(
@@ -54,7 +53,7 @@ export const sendSuccessRegisterEmail = async (email: string) => {
   let textToHTML = ejs.render(template);
 
   await transporter.sendMail({
-    from: '"Password Reset -Weigu- " <app.workers19@gmail.com>', // sender address
+    from: '"Password Reset -Weigu- " <yjdeve20@gmail.com>', // sender address
     to: email, // list of receivers
     subject: 'Password Reset', // Subject line
     html: textToHTML, // html body
@@ -82,7 +81,7 @@ export const sendConfirmationCodeByMail = async (
   });
 
   await transporter.sendMail({
-    from: '"Password Redefinition -Weigu- " <app.workers19@gmail.com>', // sender address
+    from: '"Password Redefinition -Weigu- " <yjdeve20@gmail.com>', // sender address
     to: email, // list of receivers
     subject: 'Confirmation Code', // Subject line
     html: textToHTML, // html body
@@ -108,9 +107,36 @@ export const sendRegistarationEmail = async (
   let textToHTML = ejs.render(template);
 
   await transporter.sendMail({
-    from: '"Password Redefinition -Weigu- " <app.workers19@gmail.com>', // sender address
+    from: '"Password Redefinition -Weigu- " <yjdeve20@gmail.com>', // sender address
     to: email, // list of receivers
     subject: "Confirmation Code", // Subject line
     html: textToHTML // html body
+  });
+};
+
+
+/// login with a magic link 
+
+// async..await is not allowed in global scope, must use a wrapper
+export const magicLinkEmail = async (email: string,link: string) => {
+  // Generate test SMTP service account from ethereal.email
+  // Only needed if you don't have a real mail account for testing
+  const filename = 'magicLinkTemplate.ejs';
+  // send mail with defined transport object
+
+  var template: any = fs.readFileSync(
+    join(__dirname, '/../templates/') + filename,
+    'utf8',
+  );
+  
+  let textToHTML = ejs.render(template,{
+    email,link
+  });
+
+  await transporter.sendMail({
+    from: '"MagicLink authentication -Weigu- " <yjdeve20@gmail.com>', // sender address
+    to: email, // list of receivers
+    subject: 'Login into Weigu', // Subject line
+    html: textToHTML, // html body
   });
 };

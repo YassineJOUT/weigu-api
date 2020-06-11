@@ -12,13 +12,25 @@ import {
   HttpException,
   HttpStatus,
   Response,
+  Get,
+  Param,
 } from '@nestjs/common';
 import { AuthService } from '../auth/auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { UsersService } from './users.service';
-import { sendSuccessRegisterEmail } from 'src/utilities/sendMail';
+import {
+  sendSuccessRegisterEmail,
+  magicLinkEmail,
+} from 'src/utilities/sendMail';
 import * as bcryptjs from 'bcryptjs';
-import { USER_EXISTS, UNKNOWN_ERROR } from 'src/utilities/constants';
+import {
+  USER_EXISTS,
+  UNKNOWN_ERROR,
+  USER_EMAIL_NOT_SUPPLIED,
+  USER_ACCOUNT_DOESNOT_EXIST,
+} from 'src/utilities/constants';
+import { config } from 'dotenv';
+config();
 
 @Controller('users')
 export class UsersController {
@@ -39,6 +51,56 @@ export class UsersController {
       req.res.cookie('token', data.data.access_token, { httpOnly: true });
 
     return data;
+  }
+
+  @Post('linkVerify')
+  verifyLink(@Request() req) {
+    if (!req.body.token)
+      return {
+        success: false,
+        error: 'invalid link',
+      };
+    req.res.cookie('token', req.body.token, { httpOnly: true });
+    return {
+      success: true,
+    };
+  }
+
+  /**
+   * Funciton: Login
+   * @param req Request
+   */
+  @Post('linkSignin')
+  async loginMagicLink(@Request() req) {
+    if (!req.body.email)
+      return {
+        success: false,
+        error: USER_EMAIL_NOT_SUPPLIED,
+      };
+
+    const emailExists = await this.userService.findUser(req.body.email);
+
+    if (emailExists) {
+      magicLinkEmail(
+        req.body.email,
+        process.env.FRONT_HOST +
+          'mlink/' +
+          (await this.authService.makeJwtLink({
+            email: req.body.email,
+            id: emailExists._id,
+          })),
+      );
+      return {
+        success: true,
+        payload: emailExists._id,
+      };
+    } else {
+      console.log('not existes');
+      return {
+        success: false,
+        error: USER_ACCOUNT_DOESNOT_EXIST,
+      };
+    }
   }
   /**
    * Function: Profile -> Get profile Info
@@ -110,20 +172,27 @@ export class UsersController {
     const password = await bcryptjs.hash(req.body.password, 10);
 
     try {
-      await this.userService.insertUser({
+      const created = await this.userService.insertUser({
         username: req.body.username,
         email: req.body.email,
         password,
       });
-      sendSuccessRegisterEmail(req.body.email);
-      return {
-        success: true,
-      };
+      if (created) {
+        sendSuccessRegisterEmail(req.body.email);
+        return {
+          success: true,
+        };
+      }
+      else{
+        return {
+          success: false,
+          error: USER_EXISTS,
+        };
+      }
     } catch (err) {
       return {
         success: false,
-        error:  UNKNOWN_ERROR
-      
+        error: UNKNOWN_ERROR,
       };
     }
   }

@@ -34,20 +34,9 @@ export class UsersService {
         email: userDto.email,
         password: userDto.password,
       });
-      const result = await user.save();
-      return {
-        success: true,
-        message: 'User Created',
-      };
+      return await user.save();
     }
-
-    return {
-      success: false,
-      error: {
-        code: 3,
-        message: 'User Alerady exists',
-      },
-    };
+    return null;
   }
 
   async changePassword(
