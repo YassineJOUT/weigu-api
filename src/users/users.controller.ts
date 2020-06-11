@@ -28,6 +28,7 @@ import {
   UNKNOWN_ERROR,
   USER_EMAIL_NOT_SUPPLIED,
   USER_ACCOUNT_DOESNOT_EXIST,
+  USER_SUCCESS_REGISTER,
 } from 'src/utilities/constants';
 import { config } from 'dotenv';
 config();
@@ -81,6 +82,7 @@ export class UsersController {
     const emailExists = await this.userService.findUser(req.body.email);
 
     if (emailExists) {
+      console.log('existes');
       magicLinkEmail(
         req.body.email,
         process.env.FRONT_HOST +
@@ -158,7 +160,7 @@ export class UsersController {
    * @param req Request
    */
   @Post('signup')
-  async addUser(@Request() req) {
+  async signUp(@Request() req) {
     const emailExists = await this.userService.findUser(req.body.email);
     // this is to be dropped
     if (emailExists) {
@@ -178,9 +180,10 @@ export class UsersController {
         password,
       });
       if (created) {
-        sendSuccessRegisterEmail(req.body.email);
+       sendSuccessRegisterEmail(req.body.email);
         return {
           success: true,
+          message: USER_SUCCESS_REGISTER
         };
       }
       else{
