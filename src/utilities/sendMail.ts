@@ -53,9 +53,9 @@ export const sendSuccessRegisterEmail = async (email: string) => {
   let textToHTML = ejs.render(template);
 
   await transporter.sendMail({
-    from: '"Password Reset -Weigu- " <yjdeve20@gmail.com>', // sender address
+    from: '"Account Created -Weigu- " <yjdeve20@gmail.com>', // sender address
     to: email, // list of receivers
-    subject: 'Password Reset', // Subject line
+    subject: 'Account Created', // Subject line
     html: textToHTML, // html body
   });
 };
