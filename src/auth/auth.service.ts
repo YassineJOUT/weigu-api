@@ -8,7 +8,7 @@ import * as bcryptjs from 'bcryptjs';
 import { Injectable } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
-import { USER_EXISTS } from 'src/utilities/constants';
+import { USER_EXISTS, USER_INCORRECT_CREDENTIALS } from 'src/utilities/constants';
 
 @Injectable()
 export class AuthService {
@@ -23,7 +23,7 @@ export class AuthService {
     if (!user) {
       return {
         success: false,
-        error: USER_EXISTS,
+        error: USER_INCORRECT_CREDENTIALS,
       };
     }
 
@@ -32,7 +32,7 @@ export class AuthService {
     if (!valid) {
       return {
         success: false,
-        error: USER_EXISTS,
+        error: USER_INCORRECT_CREDENTIALS,
       };
     }
 
@@ -42,14 +42,19 @@ export class AuthService {
     };
   }
 
+  async makeJwtLink(payload) {
+    if (payload) return this.jwtService.sign(payload);
+    return null;
+  }
+
   async login(user) {
     if (user.success) {
-      const playload = { email: user.data.email, sub: user.data._id };
+      const payload = { email: user.data.email, sub: user.data._id };
       const userD = user.data;
       return {
         success: true,
         data: {
-          access_token: this.jwtService.sign(playload),
+          access_token: this.jwtService.sign(payload),
           user: userD,
         },
       };
