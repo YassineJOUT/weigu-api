@@ -82,7 +82,6 @@ export class UsersController {
     const emailExists = await this.userService.findUser(req.body.email);
 
     if (emailExists) {
-      console.log('existes');
       magicLinkEmail(
         req.body.email,
         process.env.FRONT_HOST +
@@ -97,7 +96,6 @@ export class UsersController {
         payload: emailExists._id,
       };
     } else {
-      console.log('not existes');
       return {
         success: false,
         error: USER_ACCOUNT_DOESNOT_EXIST,
@@ -180,13 +178,12 @@ export class UsersController {
         password,
       });
       if (created) {
-       sendSuccessRegisterEmail(req.body.email);
+        sendSuccessRegisterEmail(req.body.email);
         return {
           success: true,
-          message: USER_SUCCESS_REGISTER
+          message: USER_SUCCESS_REGISTER,
         };
-      }
-      else{
+      } else {
         return {
           success: false,
           error: USER_EXISTS,

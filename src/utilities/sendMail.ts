@@ -69,7 +69,6 @@ export const sendConfirmationCodeByMail = async (
   // Only needed if you don't have a real mail account for testing
 
   // create reusable transporter object using the default SMTP transport
-  console.log('COnfirmation code call');
 
   // send mail with defined transport object
 
@@ -96,7 +95,6 @@ export const sendRegistarationEmail = async (
   // Only needed if you don't have a real mail account for testing
 
   // create reusable transporter object using the default SMTP transport
-  console.log('COnfirmation code call');
   const filename = 'emailText.html';
   // send mail with defined transport object
 
