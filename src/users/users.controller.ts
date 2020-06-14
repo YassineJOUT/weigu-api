@@ -4,6 +4,8 @@
  */
 
 // Import the required modules
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
 import {
   Controller,
   Post,
@@ -14,6 +16,10 @@ import {
   Response,
   Get,
   Param,
+  Body,
+  UseInterceptors,
+  UploadedFile,
+  Res,
 } from '@nestjs/common';
 import { AuthService } from '../auth/auth.service';
 import { AuthGuard } from '@nestjs/passport';
@@ -31,6 +37,8 @@ import {
   USER_SUCCESS_REGISTER,
 } from 'src/utilities/constants';
 import { config } from 'dotenv';
+import { UserDTO } from './user.model';
+import { editFileName, imageFileFilter } from 'src/utilities/fileUpload';
 config();
 
 @Controller('users')
@@ -50,7 +58,6 @@ export class UsersController {
     const data = await this.authService.login(req.user);
     if (data.success)
       req.res.cookie('token', data.data.access_token, { httpOnly: true });
-
     return data;
   }
 
@@ -110,6 +117,35 @@ export class UsersController {
   @Post('profile')
   getProfile(@Request() req) {
     //return .this.userService.profile(req.body.id);
+    return { success: true };
+  }
+
+  @Post('upload')
+  @UseInterceptors(
+    FileInterceptor('image', {
+      storage: diskStorage({
+        destination: './files',
+        filename: editFileName,
+      }),
+      fileFilter: imageFileFilter,
+    }),
+  )
+  async uploadedFile(@UploadedFile() file) {
+    const response = {
+      originalname: file.originalname,
+      filename: file.filename,
+    };
+    return response;
+  }
+  @Get(':imgpath')
+  seeUploadedFile(@Param('imgpath') image, @Res() res) {
+    return res.sendFile(image, { root: './files' });
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Post('editProfile')
+  async updateProfile(@Body() userDto: UserDTO) {
+    const updated = await this.userService.editProfile(userDto);
     return { success: true };
   }
 

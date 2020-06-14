@@ -9,7 +9,7 @@ import { User, UserDTO } from './user.model';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { sendConfirmationCodeByMail } from '../utilities/sendMail';
-
+import * as bcrypt from 'bcryptjs';
 @Injectable()
 export class UsersService {
   private readonly users: UserDTO[];
@@ -101,5 +101,21 @@ export class UsersService {
 
   async profile(id: string): Model<User> {
     return await this.userModel.findById(id);
+  }
+
+  async editProfile(userDto: UserDTO): Model<User> {
+    const user = await this.userModel.findOne({ _id: userDto.id });
+
+    if (user !== null) {
+      if (userDto.bio) user.bio = userDto.bio;
+      if (userDto.address) user.address = userDto.address;
+      if (userDto.password)
+        user.password = await bcrypt.hash(userDto.password, 10);
+      user.save();
+      // format response
+      return true;
+    }
+    //format response
+    return false;
   }
 }

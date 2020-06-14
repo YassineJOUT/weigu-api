@@ -9,6 +9,11 @@ export interface User{
     username: string;
     email: string;
     password: string;
+    bio: string;
+    address: string;
+    nameHolder: string;
+    coverImage: string;
+    profileImage: string;
     cconfirmationCode: number;
 }
 
@@ -17,6 +22,11 @@ export class UserDTO{
     public email: string,
     public username?: string, 
     public password?: string,
+    public bio?: string,
+    public address?: string,
+    public nameHolder?: string,
+    public coverImage?: string,
+    public profileImage?: string,
     public id?: string,
     public confirmationCode?: number)
     {}
