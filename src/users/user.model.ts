@@ -19,7 +19,7 @@ export interface User{
 
 export class UserDTO{
     constructor(
-    public email: string,
+    public email?: string,
     public username?: string, 
     public password?: string,
     public bio?: string,

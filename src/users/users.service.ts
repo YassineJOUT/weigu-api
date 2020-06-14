@@ -10,20 +10,22 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { sendConfirmationCodeByMail } from '../utilities/sendMail';
 import * as bcrypt from 'bcryptjs';
+import _ from 'lodash';
+
 @Injectable()
 export class UsersService {
   private readonly users: UserDTO[];
 
   constructor(@InjectModel('User') private readonly userModel: Model<User>) {}
 
-  async findUser(payload: string): Model<User> {
-    const u = await this.userModel.findOne({
-      $or: [{ _id: payload }, { email: payload }],
-    });
+  async findUser(payload: string, isEmail = false): Model<User> {
+    let u = null;
+    if (isEmail) u = await this.userModel.findOne({ email: payload });
+    else u = await this.userModel.findOne({ _id: payload });
 
     if (u !== null) return u;
 
-    return null;
+    return u;
   }
 
   async insertUser(userDto: UserDTO) {
@@ -104,9 +106,12 @@ export class UsersService {
   }
 
   async editProfile(userDto: UserDTO): Model<User> {
+    if (!(userDto.id.length > 0)) return false;
     const user = await this.userModel.findOne({ _id: userDto.id });
 
     if (user !== null) {
+      if (userDto.profileImage) user.profileImage = userDto.profileImage;
+      if (userDto.coverImage) user.coverImage = userDto.coverImage;
       if (userDto.bio) user.bio = userDto.bio;
       if (userDto.address) user.address = userDto.address;
       if (userDto.password)

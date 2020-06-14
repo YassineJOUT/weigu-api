@@ -89,7 +89,7 @@ export class UsersController {
         error: USER_EMAIL_NOT_SUPPLIED,
       };
 
-    const emailExists = await this.userService.findUser(req.body.email);
+    const emailExists = await this.userService.findUser(req.body.email, true);
 
     if (emailExists) {
       magicLinkEmail(
@@ -141,10 +141,22 @@ export class UsersController {
       fileFilter: imageFileFilter,
     }),
   )
-  async uploadedFile(@UploadedFile() file) {
+  async uploadedFile(@UploadedFile() file, @Body() body) {
+    console.log(body.userId);
+    const user = await this.userService.findUser(body.userId);
+    if (!user) return { success: false, error: UNKNOWN_USER };
+    let dto = new UserDTO();
+    dto.id = body.userId;
+    if (body.type === 'profile') dto.profileImage = file.filename;
+    else if (body.type === 'cover') dto.coverImage = file.filename;
+
+    const updated = await this.userService.editProfile(dto);
+    if (!updated) {
+      return { success: false, error: 'Profile edit did not succeed' };
+    }
     const response = {
-      originalname: file.originalname,
-      filename: file.filename,
+      success: true,
+      data: { originalname: file.originalname, filename: file.filename },
     };
     return response;
   }
@@ -157,6 +169,9 @@ export class UsersController {
   @Post('editProfile')
   async updateProfile(@Body() userDto: UserDTO) {
     const updated = await this.userService.editProfile(userDto);
+    if (!updated) {
+      return { success: false, error: 'Profile edit did not succeed' };
+    }
     return { success: true };
   }
 
@@ -206,7 +221,7 @@ export class UsersController {
    */
   @Post('signup')
   async signUp(@Request() req) {
-    const emailExists = await this.userService.findUser(req.body.email);
+    const emailExists = await this.userService.findUser(req.body.email, true);
     // this is to be dropped
     if (emailExists) {
       return {
