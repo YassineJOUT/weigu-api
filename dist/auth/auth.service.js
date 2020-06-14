@@ -20,29 +20,56 @@ var __rest = (this && this.__rest) || function (s, e) {
     return t;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const bcryptjs = require("bcryptjs");
 const common_1 = require("@nestjs/common");
 const users_service_1 = require("../users/users.service");
 const jwt_1 = require("@nestjs/jwt");
+const constants_1 = require("../utilities/constants");
 let AuthService = class AuthService {
     constructor(usersService, jwtService) {
         this.usersService = usersService;
         this.jwtService = jwtService;
     }
     async validateUser(email, pass) {
-        const user = await this.usersService.findUser(email);
-        if (user && user.password === pass) {
-            const { password } = user, result = __rest(user, ["password"]);
-            return result;
+        const user = await this.usersService.findUser(email, true);
+        if (!user) {
+            return {
+                success: false,
+                error: constants_1.USER_INCORRECT_CREDENTIALS,
+            };
         }
+        const valid = await bcryptjs.compare(pass, user.password);
+        if (!valid) {
+            return {
+                success: false,
+                error: constants_1.USER_INCORRECT_CREDENTIALS,
+            };
+        }
+        const { password: orig } = user, resultset = __rest(user, ["password"]);
+        const _a = resultset._doc, { password, __v } = _a, result = __rest(_a, ["password", "__v"]);
+        return {
+            data: result,
+            success: true,
+        };
+    }
+    async makeJwtLink(payload) {
+        if (payload)
+            return this.jwtService.sign(payload);
         return null;
     }
     async login(user) {
-        const playload = { email: user.email, sub: user._id };
-        const userD = user;
-        return {
-            access_token: this.jwtService.sign(playload),
-            user: userD
-        };
+        if (user.success) {
+            const payload = { id: user.data._id };
+            const userD = user.data;
+            return {
+                success: true,
+                data: {
+                    access_token: this.jwtService.sign(payload),
+                    user: userD,
+                },
+            };
+        }
+        return user;
     }
 };
 AuthService = __decorate([

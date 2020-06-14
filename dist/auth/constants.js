@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.constants = {
-    secret: 'Workers'
+    secret: 'WieguApp'
 };
 //# sourceMappingURL=constants.js.map

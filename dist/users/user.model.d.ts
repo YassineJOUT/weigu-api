@@ -3,13 +3,23 @@ export interface User {
     username: string;
     email: string;
     password: string;
+    bio: string;
+    address: string;
+    nameHolder: string;
+    coverImage: string;
+    profileImage: string;
     cconfirmationCode: number;
 }
 export declare class UserDTO {
-    username: string;
-    email: string;
-    password: string;
+    email?: string;
+    username?: string;
+    password?: string;
+    bio?: string;
+    address?: string;
+    nameHolder?: string;
+    coverImage?: string;
+    profileImage?: string;
     id?: string;
     confirmationCode?: number;
-    constructor(username: string, email: string, password: string, id?: string, confirmationCode?: number);
+    constructor(email?: string, username?: string, password?: string, bio?: string, address?: string, nameHolder?: string, coverImage?: string, profileImage?: string, id?: string, confirmationCode?: number);
 }

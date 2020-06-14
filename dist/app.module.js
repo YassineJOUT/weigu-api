@@ -11,13 +11,17 @@ const app_controller_1 = require("./app.controller");
 const app_service_1 = require("./app.service");
 const users_module_1 = require("./users/users.module");
 const database_module_1 = require("./db/database.module");
+const platform_express_1 = require("@nestjs/platform-express");
 let AppModule = class AppModule {
 };
 AppModule = __decorate([
     common_1.Module({
         imports: [
             database_module_1.dbModule,
-            users_module_1.UsersModule
+            users_module_1.UsersModule,
+            platform_express_1.MulterModule.register({
+                dest: './files',
+            })
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

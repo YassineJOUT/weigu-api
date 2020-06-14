@@ -14,34 +14,35 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 var _a;
 Object.defineProperty(exports, "__esModule", { value: true });
 const common_1 = require("@nestjs/common");
-const user_model_1 = require("./user.model");
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
 const sendMail_1 = require("../utilities/sendMail");
+const bcrypt = require("bcryptjs");
 let UsersService = class UsersService {
     constructor(userModel) {
         this.userModel = userModel;
     }
-    async findUser(email) {
-        console.log('finduser');
-        console.log(email);
-        const u = await this.userModel.findOne({ email });
-        console.log('u');
-        console.log(u);
-        if (u !== null) {
-            const user = new user_model_1.UserDTO(u.username, u.email, u.password, u._id);
-            return user;
-        }
-        return null;
+    async findUser(payload, isEmail = false) {
+        let u = null;
+        if (isEmail)
+            u = await this.userModel.findOne({ email: payload });
+        else
+            u = await this.userModel.findOne({ _id: payload });
+        if (u !== null)
+            return u;
+        return u;
     }
     async insertUser(userDto) {
         const u = await this.userModel.findOne({ email: userDto.email });
         if (!u) {
-            const user = new this.userModel({ username: userDto.username, email: userDto.email, password: userDto.password });
-            const result = await user.save();
-            return result._id;
+            const user = new this.userModel({
+                username: userDto.username,
+                email: userDto.email,
+                password: userDto.password,
+            });
+            return await user.save();
         }
-        return "User Alerady exists";
+        return null;
     }
     async changePassword(email, confirmationCode, new_password) {
         const user = await this.userModel.findOne({ email: email });
@@ -65,29 +66,49 @@ let UsersService = class UsersService {
             let c = parseInt(confirmCode);
             if (u.confirmationCode === c) {
                 result = {
-                    message: "Code matches " + confirmCode + " " + u.confirmationCode,
-                    match: true
+                    message: 'Code matches ' + confirmCode + ' ' + u.confirmationCode,
+                    match: true,
                 };
             }
             else {
                 result = {
-                    message: "Success ur code is " + confirmCode,
-                    match: false
+                    message: 'Success ur code is ' + confirmCode,
+                    match: false,
                 };
             }
         }
         else {
             let confirmationCode = Math.floor(1000 + Math.random() * 9000);
-            await this.userModel.update({ "_id": u._id }, { $set: { "confirmationCode": confirmationCode } });
+            await this.userModel.update({ _id: u._id }, { $set: { confirmationCode: confirmationCode } });
             sendMail_1.sendConfirmationCodeByMail(email, confirmationCode);
             result = {
-                message: "An email was send with a confirmation code.",
+                message: 'An email was send with a confirmation code.',
             };
         }
         return result;
     }
     async profile(id) {
         return await this.userModel.findById(id);
+    }
+    async editProfile(userDto) {
+        if (!(userDto.id.length > 0))
+            return false;
+        const user = await this.userModel.findOne({ _id: userDto.id });
+        if (user !== null) {
+            if (userDto.profileImage)
+                user.profileImage = userDto.profileImage;
+            if (userDto.coverImage)
+                user.coverImage = userDto.coverImage;
+            if (userDto.bio)
+                user.bio = userDto.bio;
+            if (userDto.address)
+                user.address = userDto.address;
+            if (userDto.password)
+                user.password = await bcrypt.hash(userDto.password, 10);
+            user.save();
+            return true;
+        }
+        return false;
     }
 };
 UsersService = __decorate([

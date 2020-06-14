@@ -1,10 +1,15 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class UserDTO {
-    constructor(username, email, password, id, confirmationCode) {
-        this.username = username;
+    constructor(email, username, password, bio, address, nameHolder, coverImage, profileImage, id, confirmationCode) {
         this.email = email;
+        this.username = username;
         this.password = password;
+        this.bio = bio;
+        this.address = address;
+        this.nameHolder = nameHolder;
+        this.coverImage = coverImage;
+        this.profileImage = profileImage;
         this.id = id;
         this.confirmationCode = confirmationCode;
     }
