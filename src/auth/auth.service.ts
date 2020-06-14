@@ -39,8 +39,8 @@ export class AuthService {
       };
     }
     // remove password from object
-    const {password: orig, ...resultset } = user;
-    const {password, ...result} = resultset._doc;
+    const { password: orig, ...resultset } = user;
+    const { password, __v, ...result } = resultset._doc;
     return {
       data: result,
       success: true,

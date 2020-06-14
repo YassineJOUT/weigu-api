@@ -35,10 +35,13 @@ import {
   USER_EMAIL_NOT_SUPPLIED,
   USER_ACCOUNT_DOESNOT_EXIST,
   USER_SUCCESS_REGISTER,
+  USER_ID_WAS_NOT_PROVIDED,
+  UNKNOWN_USER,
 } from 'src/utilities/constants';
 import { config } from 'dotenv';
 import { UserDTO } from './user.model';
 import { editFileName, imageFileFilter } from 'src/utilities/fileUpload';
+import { connectableObservableDescriptor } from 'rxjs/internal/observable/ConnectableObservable';
 config();
 
 @Controller('users')
@@ -114,9 +117,18 @@ export class UsersController {
    */
   @UseGuards(AuthGuard('jwt'))
   @Post('profile')
-  getProfile(@Request() req) {
-    //return .this.userService.profile(req.body.id);
-    return { success: true };
+  async getProfile(@Body() body) {
+    if (body.userId) {
+      const user = await this.userService.findUser(body.userId);
+      if (!user) return { success: false, error: UNKNOWN_USER };
+      const { password: old, ...resultset } = user;
+      const { password, __v, ...resul } = resultset._doc;
+      return {
+        success: true,
+        data: resul,
+      };
+    }
+    return { success: false, error: USER_ID_WAS_NOT_PROVIDED };
   }
 
   @Post('upload')

@@ -5,3 +5,5 @@ export const USER_SUCCESS_LOGIN = 'Authentication succeeded';
 export const UNKNOWN_ERROR = 'Something went wrong';
 export const USER_EMAIL_NOT_SUPPLIED = 'User email was not supplied';
 export const USER_ACCOUNT_DOESNOT_EXIST = 'Account does not exists';
+export const USER_ID_WAS_NOT_PROVIDED = 'Id was not provided';
+export const UNKNOWN_USER = 'UNKNOWN USER';

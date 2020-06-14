@@ -16,9 +16,11 @@ export class UsersService {
 
   constructor(@InjectModel('User') private readonly userModel: Model<User>) {}
 
-  async findUser(email: string): Model<User> {
-    const u = await this.userModel.findOne({ email });
-    
+  async findUser(payload: string): Model<User> {
+    const u = await this.userModel.findOne({
+      $or: [{ _id: payload }, { email: payload }],
+    });
+
     if (u !== null) return u;
 
     return null;
