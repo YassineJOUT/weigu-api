@@ -92,9 +92,8 @@ export class UsersController {
       magicLinkEmail(
         req.body.email,
         process.env.FRONT_HOST +
-          'mlink/' +
+          '/mlink/' +
           (await this.authService.makeJwtLink({
-            email: req.body.email,
             id: emailExists._id,
           })),
       );

@@ -8,7 +8,10 @@ import * as bcryptjs from 'bcryptjs';
 import { Injectable } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
-import { USER_EXISTS, USER_INCORRECT_CREDENTIALS } from 'src/utilities/constants';
+import {
+  USER_EXISTS,
+  USER_INCORRECT_CREDENTIALS,
+} from 'src/utilities/constants';
 
 @Injectable()
 export class AuthService {
@@ -35,9 +38,11 @@ export class AuthService {
         error: USER_INCORRECT_CREDENTIALS,
       };
     }
-
+    // remove password from object
+    const {password: orig, ...resultset } = user;
+    const {password, ...result} = resultset._doc;
     return {
-      data: user,
+      data: result,
       success: true,
     };
   }
@@ -49,7 +54,8 @@ export class AuthService {
 
   async login(user) {
     if (user.success) {
-      const payload = { email: user.data.email, sub: user.data._id };
+      const payload = { id: user.data._id };
+
       const userD = user.data;
       return {
         success: true,
