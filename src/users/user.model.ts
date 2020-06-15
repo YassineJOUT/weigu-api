@@ -13,6 +13,7 @@ export interface User{
     address: string;
     nameHolder: string;
     coverImage: string;
+    birthDate: Date;
     profileImage: string;
     cconfirmationCode: number;
 }
@@ -27,6 +28,7 @@ export class UserDTO{
     public nameHolder?: string,
     public coverImage?: string,
     public profileImage?: string,
+    public birthDate?: Date,
     public id?: string,
     public confirmationCode?: number)
     {}

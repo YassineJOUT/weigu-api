@@ -35,6 +35,8 @@ export class UsersService {
         username: userDto.username,
         email: userDto.email,
         password: userDto.password,
+        coverImage: 'default-cover.png',
+        profileImage: 'default-profile.png',
       });
       return await user.save();
     }
