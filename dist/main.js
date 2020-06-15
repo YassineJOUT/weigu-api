@@ -3,9 +3,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = require("@nestjs/core");
 const app_module_1 = require("./app.module");
 const cookieParser = require("cookie-parser");
+console.log(process.env.FRONT_HOST);
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
-    const options = { credentials: true, origin: "http://localhost:3000" };
+    const options = { credentials: true, origin: process.env.FRONT_HOST };
     app.enableCors(options);
     app.use(cookieParser());
     await app.listen(3010);

@@ -1558,7 +1558,7 @@
         "signature": "2608cfd623840916e664e68c3dc5eb4347ccae822f808d899bf00e73cbab2bfe"
       },
       "../src/main.ts": {
-        "version": "1e9fc69ff1829b91692417dbc99b0254ab3448b1df4435302b51343f637b5f85",
+        "version": "fb07433761406527b93d2c3beb4c0b3f0db89a11e37736de8330f89e1201d07a",
         "signature": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881"
       },
       "../node_modules/@types/anymatch/index.d.ts": {
