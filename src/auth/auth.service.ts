@@ -12,6 +12,7 @@ import {
   USER_EXISTS,
   USER_INCORRECT_CREDENTIALS,
 } from 'src/utilities/constants';
+import { constants } from './constants';
 
 @Injectable()
 export class AuthService {
@@ -50,6 +51,10 @@ export class AuthService {
   async makeJwtLink(payload) {
     if (payload) return this.jwtService.sign(payload);
     return null;
+  }
+  async decodeJwt(token) {
+    const t = this.jwtService.verify(token);
+    return t;
   }
 
   async login(user) {

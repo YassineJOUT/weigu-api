@@ -65,16 +65,29 @@ export class UsersController {
   }
 
   @Post('linkVerify')
-  verifyLink(@Request() req) {
+  async verifyLink(@Request() req) {
+   
     if (!req.body.token)
       return {
         success: false,
         error: 'invalid link',
       };
-    req.res.cookie('token', req.body.token, { httpOnly: true });
-    return {
-      success: true,
-    };
+      try{
+        const decoded = await this.authService.decodeJwt(req.body.token);
+        req.res.cookie('token', req.body.token, { httpOnly: true });
+        return {
+          success: true,
+          id: decoded.id
+        };
+      }catch(err) {
+        return {
+          success: false,
+          error: "Votre lien magic est expiré"
+        };
+      }
+   
+    
+    
   }
 
   /**
@@ -118,6 +131,8 @@ export class UsersController {
   @UseGuards(AuthGuard('jwt'))
   @Post('profile')
   async getProfile(@Body() body) {
+    console.log("body");
+    console.log(body);
     if (body.userId) {
       const user = await this.userService.findUser(body.userId);
       if (!user) return { success: false, error: UNKNOWN_USER };
