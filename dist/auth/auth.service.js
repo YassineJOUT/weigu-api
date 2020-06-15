@@ -57,6 +57,10 @@ let AuthService = class AuthService {
             return this.jwtService.sign(payload);
         return null;
     }
+    async decodeJwt(token) {
+        const t = this.jwtService.verify(token);
+        return t;
+    }
     async login(user) {
         if (user.success) {
             const payload = { id: user.data._id };

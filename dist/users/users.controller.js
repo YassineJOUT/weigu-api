@@ -47,16 +47,26 @@ let UsersController = class UsersController {
             req.res.cookie('token', data.data.access_token, { httpOnly: true });
         return data;
     }
-    verifyLink(req) {
+    async verifyLink(req) {
         if (!req.body.token)
             return {
                 success: false,
                 error: 'invalid link',
             };
-        req.res.cookie('token', req.body.token, { httpOnly: true });
-        return {
-            success: true,
-        };
+        try {
+            const decoded = await this.authService.decodeJwt(req.body.token);
+            req.res.cookie('token', req.body.token, { httpOnly: true });
+            return {
+                success: true,
+                id: decoded.id
+            };
+        }
+        catch (err) {
+            return {
+                success: false,
+                error: "Votre lien magic est expiré"
+            };
+        }
     }
     async loginMagicLink(req) {
         if (!req.body.email)
@@ -84,6 +94,8 @@ let UsersController = class UsersController {
         }
     }
     async getProfile(body) {
+        console.log("body");
+        console.log(body);
         if (body.userId) {
             const user = await this.userService.findUser(body.userId);
             if (!user)
@@ -197,7 +209,7 @@ __decorate([
     __param(0, common_1.Request()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], UsersController.prototype, "verifyLink", null);
 __decorate([
     common_1.Post('linkSignin'),

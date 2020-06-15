@@ -6,13 +6,15 @@ export declare class UsersController {
     private readonly authService;
     constructor(userService: UsersService, authService: AuthService);
     login(req: any): Promise<any>;
-    verifyLink(req: any): {
+    verifyLink(req: any): Promise<{
         success: boolean;
         error: string;
+        id?: undefined;
     } | {
         success: boolean;
+        id: any;
         error?: undefined;
-    };
+    }>;
     loginMagicLink(req: any): Promise<{
         success: boolean;
         error: string;
