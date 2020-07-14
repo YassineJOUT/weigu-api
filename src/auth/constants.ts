@@ -5,5 +5,5 @@
 
 // Export token secret as a constant
 export const constants = {
-    secret: 'Workers'
+    secret: 'WieguApp'
 }

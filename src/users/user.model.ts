@@ -9,14 +9,26 @@ export interface User{
     username: string;
     email: string;
     password: string;
+    bio: string;
+    address: string;
+    nameHolder: string;
+    coverImage: string;
+    birthDate: Date;
+    profileImage: string;
     cconfirmationCode: number;
 }
 
 export class UserDTO{
     constructor(
-    public username: string, 
-    public email: string,
-    public password: string,
+    public email?: string,
+    public username?: string, 
+    public password?: string,
+    public bio?: string,
+    public address?: string,
+    public nameHolder?: string,
+    public coverImage?: string,
+    public profileImage?: string,
+    public birthDate?: Date,
     public id?: string,
     public confirmationCode?: number)
     {}
